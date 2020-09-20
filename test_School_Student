@@ -1,0 +1,70 @@
+import pytest
+from School_Student import Student, School
+
+
+def test_student():
+    student = Student('Jan', 'Kowalski', 24)
+    assert student.grades == []
+
+
+@pytest.mark.parametrize("grades_input, expected", [
+    ([2, 5], [2, 5]),
+    ([1, 6], [1, 6]),
+    ([3, 3], [3, 3]),
+    ([5, 4], [5, 4])
+])
+
+def test_add_grades(grades_input, expected):
+    student = Student('Jan', 'Kowalski', 24)
+    student.add_grades(*grades_input)
+    assert student.grades == expected
+
+
+def test_remove_grade_within_list():
+    student = Student('Jan', 'Kowalski', 24)
+    student.add_grade(2, 2, 5)
+    student.remove_grade(2)
+    assert student.grades == [2, 2]
+
+
+def test_remove_grade_out_of_list():
+    student = Student('Jan', 'Kowalski', 24)
+    student.add_grades(2, 2, 5)
+    with pytest.raises(IndexError) as exc:
+        student.remove_grade(10)
+    assert str(exc.value) == "Grade index is out of range"
+
+
+@pytest.mark.parametrize("entry, expected", [
+    (Student("Jan", "Kowalski", 20), 1),
+    (Student("Jan", "Nowak", 22), 1),
+])
+
+def test_school_add_student(entry, expected):
+    school = School("Uni", "Warsaw")
+    school.add_student(entry)
+    print(school.students)
+    assert len(school.students) == expected
+
+
+@pytest.mark.parametrize("entry, expected", [
+    ([Student("Jan", "Kowalski", 20), (Student("Jan", "Nowak", 22))], 2),
+    ([Student("Jan", "Nowak", 23), (Student("Jan", "Nowak", 22))], 2),
+])
+
+def test_school_add_student(entry, expected):
+    school = School("Uni", "Warsaw")
+    school.add_students(*entry)
+    print(school.students)
+    assert len(school.students) == expected
+
+
+@pytest.mark.parametrize("entry, expected", [
+    (["Not student 1", "Not student 2"], 0),
+    (["Not student 3", "Not student 4"], 0),
+])
+
+def test_school_add_student_not_student_type(entry, expected):
+    school = School("Uni", "Warsaw")
+    with pytest.raises(TypeError):
+        school.add_students(*entry)
